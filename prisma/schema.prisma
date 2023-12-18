@@ -11,19 +11,74 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  hash      String
-  createdAt DateTime @default(now())
-  roles     Role[]
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  hash     String
+
+  guide   Guide?
+  tourist Tourist?
+  roles   Role[]
 
   @@map("users")
 }
 
 model Role {
-  id    Int    @id @default(autoincrement())
-  name  String @unique
-  users User[]
+  id       Int    @id @default(autoincrement())
+  roleName String @unique
 
-  @@map("roles")
+  users User[]
+}
+
+model Guide {
+  id       Int    @id @default(autoincrement())
+  fullName String
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique
+
+  landmarks Landmark[]
+}
+
+model Group {
+  id                Int     @id @default(autoincrement())
+  groupName         String
+  recreationProgram String?
+  hotelName         String?
+
+  tourist  Tourist?
+  landmark Landmark?
+  schedules Schedule[]
+}
+
+model Tourist {
+  id       Int    @id @default(autoincrement())
+  fullName String
+
+  user    User  @relation(fields: [userId], references: [id])
+  userId  Int   @unique
+  group   Group @relation(fields: [groupId], references: [id])
+  groupId Int   @unique
+}
+
+model Landmark {
+  id           Int      @id @default(autoincrement())
+  landmarkName String
+  dateTime     DateTime
+
+  group   Group @relation(fields: [groupId], references: [id])
+  groupId Int   @unique
+  guide   Guide @relation(fields: [guideId], references: [id])
+  guideId Int   @unique
+
+  schedules Schedule[]
+}
+
+model Schedule {
+  id           Int      @id @default(autoincrement())
+  dateOfVisit DateTime
+
+  landmark   Landmark @relation(fields: [landmarkId], references: [id])
+  landmarkId Int   @unique
+
+  groups Group[]
 }
