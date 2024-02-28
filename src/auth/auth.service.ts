@@ -1,4 +1,9 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as argon2 from 'argon2';
 import { UsersService } from 'src/users/user.service';
@@ -23,7 +28,13 @@ export class AuthService {
       throw new ForbiddenException('Bad credentials');
     }
 
-    const payload = { sub: user.id, email: user.username, roles: user.roles };
+    const payload = {
+      sub: user.id,
+      username: user.username,
+      roles: user.roles,
+    };
+    console.log(typeof payload.roles);
+    
 
     const accessToken = await this.jwt.signAsync(payload);
     return { accessToken };
@@ -54,11 +65,39 @@ export class AuthService {
     });
     const payload = {
       sub: newUserWithRoles.id,
-      email: newUserWithRoles.username,
+      username: newUserWithRoles.username,
       roles: newUserWithRoles.roles,
     };
 
     const accessToken = await this.jwt.signAsync(payload);
     return { accessToken };
+  }
+
+  async getUserFromToken(@Req() req) {
+    const authHeader = req.headers.authorization;
+
+    const bearer = authHeader.split(' ')[0];
+    const token = authHeader.split(' ')[1];
+
+    if (bearer !== 'Bearer' || !token) {
+      throw new UnauthorizedException('User is not authorized');
+    }
+
+    const tokenPayload = this.jwt.verify(token, {
+      secret: process.env.JWT_ACCESS_SECRET,
+    });
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: tokenPayload.sub,
+      },
+      include: {
+        roles: true,
+      }
+    });
+
+    req.user = tokenPayload;
+    delete tokenPayload.sub;
+    return user;
   }
 }

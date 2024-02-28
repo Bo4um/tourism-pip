@@ -14,7 +14,9 @@ import { Role } from 'src/role/role.enum';
 import { UsersService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -33,6 +35,8 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @UseGuards(RolesGuard)
+  @Roles(Role.Admin)
   @Get(':id')
   async findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id);

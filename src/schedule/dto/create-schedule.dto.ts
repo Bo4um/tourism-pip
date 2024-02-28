@@ -1,8 +1,11 @@
-import { IsDate, IsInt } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsDateString, IsInt } from 'class-validator';
 
 export class CreateScheduleDto {
-  @IsDate()
+  @ApiProperty()
+  @IsDateString()
   dateOfVisit: Date;
+  @ApiProperty()
   @IsInt()
   landmarkId: number;
 }

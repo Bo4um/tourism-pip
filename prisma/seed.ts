@@ -12,32 +12,8 @@ const rolesNames: string[] = [
 
 const usersData = [
   {
-    firstName: 'Иван',
-    lastName: 'Иванов',
-    email: 'ivanov@example.com',
-    phoneNumber: '+375291234567',
+    username: 'admin',
     hash: '12345678',
-  },
-  {
-    firstName: 'Мария',
-    lastName: 'Петрова',
-    email: 'petrova@example.com',
-    phoneNumber: '+375292345678',
-    hash: 'password123',
-  },
-  {
-    firstName: 'Алексей',
-    lastName: 'Сидоров',
-    email: 'sidorov@example.com',
-    phoneNumber: '+375293456789',
-    hash: 'qwertyui',
-  },
-  {
-    firstName: 'Елена',
-    lastName: 'Кузнецова',
-    email: 'kuznetsova@example.com',
-    phoneNumber: '+375294567890',
-    hash: 'securepass',
   },
 ];
 
@@ -47,6 +23,23 @@ async function main() {
   }));
   await prisma.role.createMany({
     data: rolesData,
+  });
+  const hashedUsersData = await Promise.all(
+    usersData.map(async (user) => {
+      user.hash = await argon2.hash(user.hash);
+      return user;
+    }),
+  );
+  await prisma.user.createMany({
+    data: hashedUsersData,
+  });
+  await prisma.user.update({
+    where: { id: 1 },
+    data: {
+      roles: {
+        connect: [{ id: 1 }],
+      },
+    },
   });
 }
 
