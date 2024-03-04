@@ -5,6 +5,8 @@ export class SignUpDto {
   @ApiProperty({ example: 'username' })
   @IsString()
   username: string;
+  @IsString()
+  fullName: string;
   @ApiProperty({ example: 'password' })
   @IsString()
   @MinLength(8)

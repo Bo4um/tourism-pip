@@ -52,11 +52,17 @@ export class AuthService {
         hash,
       },
     });
+    const newTourist = await this.prisma.tourist.create({
+      data: {
+        userId: newUser.id,
+        fullName: dto.fullName
+      }
+    });
     const newUserWithRoles = await this.prisma.user.update({
       where: { id: newUser.id },
       data: {
         roles: {
-          connect: [{ id: 3 }],
+          connect: [{ id: 3 }, { id: 5 }],
         },
       },
       include: {
