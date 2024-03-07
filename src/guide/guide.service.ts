@@ -129,4 +129,44 @@ export class GuideService {
     
     return schedules;
   }
+
+  async getGroups(@Req() req) {
+    const authHeader = req.headers.authorization;
+
+    const bearer = authHeader.split(' ')[0];
+    const token = authHeader.split(' ')[1];
+
+    if (bearer !== 'Bearer' || !token) {
+      throw new UnauthorizedException('User is not authorized');
+    }
+
+    const tokenPayload = this.jwt.verify(token, {
+      secret: process.env.JWT_ACCESS_SECRET,
+    });
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: tokenPayload.sub,
+      },
+      include: {
+        roles: true,
+        guide: true,
+      }
+    });
+
+    const guide = user.guide;
+
+    let landmarks = await this.prisma.landmark.findMany({
+      where: {
+        guideId: guide.id,
+      },
+      include: {
+        group: true,
+      }
+    });
+
+    const groups = landmarks.map(landmark => landmark.group);
+    
+    return groups;
+  }
 }

@@ -21,6 +21,11 @@ export class GuideController {
     return this.guideService.getSchedules(req);
   }
 
+  @Get('/groups')
+  async findGroups(@Req() req) {
+    return this.guideService.getGroups(req);
+  }
+
   @Post()
   async create(@Body() dto: CreateGuideDto) {
     return this.guideService.create(dto);
