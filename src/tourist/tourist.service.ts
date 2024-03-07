@@ -97,6 +97,53 @@ export class TouristService {
     });
 
     console.log(allTourists);
+
+    return allTourists;
+    
+    
+  }
+
+  async getLandmarks(@Req() req) {
+    const authHeader = req.headers.authorization;
+
+    const bearer = authHeader.split(' ')[0];
+    const token = authHeader.split(' ')[1];
+
+    if (bearer !== 'Bearer' || !token) {
+      throw new UnauthorizedException('User is not authorized');
+    }
+
+    const tokenPayload = this.jwt.verify(token, {
+      secret: process.env.JWT_ACCESS_SECRET,
+    });
+
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: tokenPayload.sub,
+      },
+      include: {
+        roles: true,
+        tourist: {
+          include: {
+            group: true,
+          }
+        }
+      }
+    });
+
+    const group = user.tourist?.group;
+
+    console.log(user);
+
+    const landmarks = await this.prisma.landmark.findMany({
+      where: {
+        groupId: group.id,
+      }
+    });
+
+    console.log(landmarks);
+
+    return landmarks;
     
     
   }

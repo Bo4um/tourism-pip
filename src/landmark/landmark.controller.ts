@@ -22,7 +22,7 @@ import { Roles } from 'src/auth/roles-auth.decorator';
 export class LandmarkController {
   constructor(private readonly landmarkService: LandmarkService) {}
 
-  @Roles(Role.Admin)
+  // @Roles(Role.Admin)
   @Post()
   create(@Body() dto: CreateLandmarkDto) {
     return this.landmarkService.create(dto);

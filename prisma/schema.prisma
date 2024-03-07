@@ -46,7 +46,7 @@ model Group {
   hotelName         String?
 
   tourist   Tourist[]
-  landmark  Landmark?
+  landmark  Landmark[]
   schedules Schedule[]
 }
 
@@ -66,9 +66,9 @@ model Landmark {
   dateTime     DateTime
 
   group   Group? @relation(fields: [groupId], references: [id])
-  groupId Int?   @unique
+  groupId Int?
   guide   Guide? @relation(fields: [guideId], references: [id])
-  guideId Int?   @unique
+  guideId Int?
 
   schedules Schedule[]
 }

@@ -20,6 +20,11 @@ export class TouristController {
   getAllTourists(@Req() req) {
     return this.touristService.getAllTourists(req);
   }
+
+  @Get('landmarks')
+  getLandmarks(@Req() req) {
+    return this.touristService.getLandmarks(req);
+  }
   
   @Post()
   create(@Body() dto: CreateTouristDto) {

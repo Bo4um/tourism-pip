@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsInt, IsString } from 'class-validator';
+import { IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class CreateLandmarkDto {
   @ApiProperty()
@@ -11,6 +11,7 @@ export class CreateLandmarkDto {
   @ApiProperty()
   @IsInt()
   groupId: number;
+  @IsOptional()
   @ApiProperty()
   @IsInt()
   guideId: number;

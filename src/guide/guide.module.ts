@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { GuideService } from './guide.service';
 import { GuideController } from './guide.controller';
 import { JwtModule, JwtService } from '@nestjs/jwt';
+import { UsersModule } from 'src/users/user.module';
 
 @Module({
   controllers: [GuideController],
@@ -11,6 +12,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
     signOptions: {
       expiresIn: '1h',
     },
-  }),]
+  }),
+UsersModule]
 })
 export class GuideModule {}

@@ -1,21 +1,45 @@
-import { Injectable, NotFoundException, Req, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, Req, UnauthorizedException } from '@nestjs/common';
 import { CreateGuideDto } from './dto/create-guide.dto';
 import { UpdateGuideDto } from './dto/update-guide.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { group } from 'console';
+import { UsersService } from 'src/users/user.service';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class GuideService {
-  constructor(private prisma: PrismaService, private jwt: JwtService,) {}
+  constructor(private prisma: PrismaService, private jwt: JwtService, private usersService: UsersService) {}
   async create(dto: CreateGuideDto) {
-    const guide = await this.prisma.guide.create({
+    const user = await this.usersService.findByUsername(dto.username);
+    if (user) {
+      throw new ForbiddenException('This username is already in use');
+    }
+    const hash = await argon2.hash(dto.password);
+    const newUser = await this.prisma.user.create({
       data: {
-        fullName: dto.fullName,
-        userId: dto.userId,
+        username: dto.username,
+        hash,
       },
     });
-    return guide;
+    const newGuide = await this.prisma.guide.create({
+      data: {
+        userId: newUser.id,
+        fullName: dto.fullName
+      }
+    });
+    const newUserWithRoles = await this.prisma.user.update({
+      where: { id: newUser.id },
+      data: {
+        roles: {
+          connect: [{ id: 3 }, { id: 4 }],
+        },
+      },
+      include: {
+        roles: true,
+      },
+    });
+    return newGuide;
   }
 
   async findAll() {
