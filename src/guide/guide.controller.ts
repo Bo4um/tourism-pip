@@ -16,10 +16,10 @@ import { UpdateGuideDto } from './dto/update-guide.dto';
 export class GuideController {
   constructor(private readonly guideService: GuideService) {}
 
-  // @Get('/schedules')
-  // async findSchedules(@Req() req) {
-  //   return this.guideService.getSchedules(req);
-  // }
+  @Get('/schedules')
+  async findSchedules(@Req() req) {
+    return this.guideService.getSchedules(req);
+  }
 
   @Post()
   async create(@Body() dto: CreateGuideDto) {

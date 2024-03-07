@@ -84,37 +84,49 @@ export class GuideService {
     return deleteGuide;
   }
 
-  // async getSchedules(@Req() req) {
-  //   const authHeader = req.headers.authorization;
+  async getSchedules(@Req() req) {
+    const authHeader = req.headers.authorization;
 
-  //   const bearer = authHeader.split(' ')[0];
-  //   const token = authHeader.split(' ')[1];
+    const bearer = authHeader.split(' ')[0];
+    const token = authHeader.split(' ')[1];
 
-  //   if (bearer !== 'Bearer' || !token) {
-  //     throw new UnauthorizedException('User is not authorized');
-  //   }
+    if (bearer !== 'Bearer' || !token) {
+      throw new UnauthorizedException('User is not authorized');
+    }
 
-  //   const tokenPayload = this.jwt.verify(token, {
-  //     secret: process.env.JWT_ACCESS_SECRET,
-  //   });
+    const tokenPayload = this.jwt.verify(token, {
+      secret: process.env.JWT_ACCESS_SECRET,
+    });
 
-  //   const user = await this.prisma.user.findUnique({
-  //     where: {
-  //       id: tokenPayload.sub,
-  //     },
-  //     include: {
-  //       roles: true,
-  //       guide: {
-  //         include: {
-            
-  //         }
-  //       },
-  //     }
-  //   });
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id: tokenPayload.sub,
+      },
+      include: {
+        roles: true,
+        guide: true,
+      }
+    });
 
-  //   const foundTourist = user.tourist;
+    const guide = user.guide;
 
-  //   console.log(user);
+    const landmarks = await this.prisma.landmark.findMany({
+      where: {
+        guideId: guide.id,
+      }
+    })
+
+    console.log(landmarks);
     
-  // }
+
+    const schedules = await this.prisma.schedule.findMany({
+      where: {
+        landmark: {
+          guideId: guide.id,
+        }
+      }
+    });
+    
+    return schedules;
+  }
 }
