@@ -1,11 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Req, UnauthorizedException } from '@nestjs/common';
 import { CreateGuideDto } from './dto/create-guide.dto';
 import { UpdateGuideDto } from './dto/update-guide.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
+import { group } from 'console';
 
 @Injectable()
 export class GuideService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private jwt: JwtService,) {}
   async create(dto: CreateGuideDto) {
     const guide = await this.prisma.guide.create({
       data: {
@@ -57,4 +59,38 @@ export class GuideService {
       });
     return deleteGuide;
   }
+
+  // async getSchedules(@Req() req) {
+  //   const authHeader = req.headers.authorization;
+
+  //   const bearer = authHeader.split(' ')[0];
+  //   const token = authHeader.split(' ')[1];
+
+  //   if (bearer !== 'Bearer' || !token) {
+  //     throw new UnauthorizedException('User is not authorized');
+  //   }
+
+  //   const tokenPayload = this.jwt.verify(token, {
+  //     secret: process.env.JWT_ACCESS_SECRET,
+  //   });
+
+  //   const user = await this.prisma.user.findUnique({
+  //     where: {
+  //       id: tokenPayload.sub,
+  //     },
+  //     include: {
+  //       roles: true,
+  //       guide: {
+  //         include: {
+            
+  //         }
+  //       },
+  //     }
+  //   });
+
+  //   const foundTourist = user.tourist;
+
+  //   console.log(user);
+    
+  // }
 }

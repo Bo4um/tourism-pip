@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
 } from '@nestjs/common';
 import { GuideService } from './guide.service';
 import { CreateGuideDto } from './dto/create-guide.dto';
@@ -14,6 +15,11 @@ import { UpdateGuideDto } from './dto/update-guide.dto';
 @Controller('guide')
 export class GuideController {
   constructor(private readonly guideService: GuideService) {}
+
+  // @Get('/schedules')
+  // async findSchedules(@Req() req) {
+  //   return this.guideService.getSchedules(req);
+  // }
 
   @Post()
   async create(@Body() dto: CreateGuideDto) {
@@ -39,4 +45,5 @@ export class GuideController {
   async remove(@Param('id') id: string) {
     return this.guideService.remove(+id);
   }
+
 }

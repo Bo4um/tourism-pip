@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
 } from '@nestjs/common';
 import { TouristService } from './tourist.service';
 import { CreateTouristDto } from './dto/create-tourist.dto';
@@ -15,6 +16,11 @@ import { UpdateTouristDto } from './dto/update-tourist.dto';
 export class TouristController {
   constructor(private readonly touristService: TouristService) {}
 
+  @Get('tourists')
+  getAllTourists(@Req() req) {
+    return this.touristService.getAllTourists(req);
+  }
+  
   @Post()
   create(@Body() dto: CreateTouristDto) {
     return this.touristService.create(dto);
